@@ -1,0 +1,15 @@
+on:
+  pull_request:
+permissions: {}
+jobs:
+  errors:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          echo "sha=$GITHUB_SHA head=$HEAD_SHA"
+          gh api "repos/$GITHUB_REPOSITORY/codeowners/errors?ref=$GITHUB_SHA" --jq '"merge commit: \(.errors | map("line \(.line): \(.kind)") | join(", "))"'
